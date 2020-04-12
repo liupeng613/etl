@@ -1,9 +1,7 @@
 package com.xiaogj.service.impl;
 
-import com.xiaogj.config.AppConfig;
 import com.xiaogj.service.DbViewer;
 import com.xiaogj.util.DataXJobFile;
-import com.xiaogj.vo.DBInfoVO;
 import com.xiaogj.vo.DataTable;
 import com.xiaogj.vo.DataTableStatus;
 import org.apache.commons.logging.Log;
@@ -30,18 +28,6 @@ public class JobJsonGenerator {
 
 	@Autowired
 	private DataXJobFile jobFile;
-
-	@Autowired
-	private AppConfig appConfig;
-
-	public void generateMS2CK(List<DBInfoVO> dbInfoList) throws SQLException {
-
-	}
-
-	public void generateCK2CK(List<DBInfoVO> dbInfoList)
-	{
-
-	}
 
 	public void generate() throws SQLException {
 		List<DataTableStatus> sourceTables = viewer.getSourceTransfterTablesStatus();

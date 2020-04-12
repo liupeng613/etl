@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/../DataX-Migration/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX-Migration/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/clickhousereader/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/clickhousereader/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/clickhousewriter/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/clickhousewriter/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/core/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/mysqlreader/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/mysqlreader/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/mysqlwriter/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/mysqlwriter/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/plugin-rdbms-util/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/plugin-unstructured-storage-util/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/rdbmsreader/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/rdbmsreader/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/rdbmswriter/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/rdbmswriter/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/sqlserverreader/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/sqlserverreader/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/sqlserverwriter/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/sqlserverwriter/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/streamreader/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/streamreader/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/streamwriter/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/streamwriter/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../DataX/transformer/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../datax-server/src/main/java" charset="UTF-8" />
+  </component>
+</project>

@@ -2,11 +2,9 @@ package com.xiaogj.util;
 
 import com.jayway.jsonpath.JsonPath;
 import com.xiaogj.config.AppConfig;
-import com.xiaogj.vo.DBInfoVO;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -21,23 +19,6 @@ public class DataXJobFile {
 
 	@Autowired
 	private AppConfig config;
-
-	public void generateJsonJobFile(DBInfoVO source, DBInfoVO target)
-	{
-		String json = getTemplate();
-		//CharSequence cols = getColumnsString(columns);
-		//int channels = getChannelNumber(migrationRecords);
-		json = json.replace("{job.channel}", "1");
-
-
-		json = json.replace("{source.db.username}", source.getUsername());
-		json = json.replace("{source.db.password}", source.getPassword());
-		//json = json.replace("{source.db.table.columns}", cols);
-		//json = json.replace("{source.db.table.pk}", pk == null ? "" : pk);
-		json = json.replace("{source.db.table.name}", sourceTableName);
-		json = json.replace("{source.db.url}", config.getSourceDbUrl());
-		json = json.replace("{source.db.type}", getDbType(config.getSourceDbUrl()));
-	}
 
 	public void generateJsonJobFile(String sourceTableName, String targetTableName, List<String> columns, String pk, String whereClause, long migrationRecords) {
 
@@ -203,7 +184,7 @@ public class DataXJobFile {
 	}
 
 	private void readToBuffer(StringBuffer buffer, String filePath) throws IOException {
-		InputStream is = new ClassPathResource("/job/jobtemplate.json").getInputStream();
+		InputStream is = DataXJobFile.class.getClassLoader().getResourceAsStream(filePath);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 		String line; 
 		line = reader.readLine(); 

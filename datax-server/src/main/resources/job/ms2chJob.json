@@ -12,39 +12,44 @@
         "content": [
             {
                 "reader": {
-                    "name": "{source.db.type}reader",
+                    "name": "sqlserverreader",
                     "parameter": {
                         "username":"{source.db.username}",
                         "password":"{source.db.password}",
-                        "column" : [{source.db.table.columns}],
-                        "splitPk": "{source.db.table.pk}",
-                        {source.db.table.where.clause}
+                        "column": [
+                            "*"
+                        ],
                         "connection": [
                             {
                                 "table": [
                                     "{source.db.table.name}"
                                 ],
                                 "jdbcUrl": [
-                                    "{source.db.url}"
+                                    "{source.db.jdbcUrl}"
                                 ]
                             }
                         ]
                     }
                 },
                 "writer": {
-                    "name": "{target.db.type}writer",
+                    "name": "clickhousewriter",
                     "parameter": {
                         "username":"{target.db.username}",
                         "password":"{target.db.password}",
-                        "column" : [{target.db.table.columns}],
                         "writeMode":"insert",
                         "connection": [
                             {
-                                "jdbcUrl": "{target.db.url}",
+                                "jdbcUrl": "{target.db.jdbcUrl}",
                                 "table": [
                                     "{target.db.table.name}"
                                 ]
                             }
+                        ],
+                        "column": [
+                            "*"
+                        ],
+                        "postSql": [
+                            "select count() from @table;"
                         ]
                     }
                 }

@@ -178,6 +178,4 @@ public class DbViewerImpl implements DbViewer {
         return result;
     }
 
-
-
 }
