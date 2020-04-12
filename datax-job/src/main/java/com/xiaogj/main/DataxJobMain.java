@@ -57,5 +57,27 @@ public class DataxJobMain {
     }
 
     private static void exit() {
+        public class TestDatax {
+            public static void main(String[] args) {
+                try {
+                    WebLogs.info("start");
+
+                    String windowcmd = "cmd /c python datax.py D:\\Software\\install\\Environment\\DataX\\datax\\job\\mysql2mysql.json";
+                    WebLogs.info(windowcmd);
+                    //.exec("你的命令",null,new File("datax安装路径"));
+                    Process pr = Runtime.getRuntime().exec(windowcmd,null,new File("D:\\Software\\install\\Environment\\DataX\\datax\\bin"));
+                    BufferedReader in = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+                    String line = null;
+                    while ((line = in.readLine()) != null) {
+                        WebLogs.info(line);
+                    }
+                    in.close();
+                    pr.waitFor();
+                    WebLogs.info("end");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

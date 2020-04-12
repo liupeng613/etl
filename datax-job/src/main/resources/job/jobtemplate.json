@@ -16,9 +16,7 @@
                     "parameter": {
                         "username":"{source.db.username}",
                         "password":"{source.db.password}",
-                        "column" : [{source.db.table.columns}],
                         "splitPk": "{source.db.table.pk}",
-                        {source.db.table.where.clause}
                         "connection": [
                             {
                                 "table": [
@@ -36,8 +34,10 @@
                     "parameter": {
                         "username":"{target.db.username}",
                         "password":"{target.db.password}",
-                        "column" : [{target.db.table.columns}],
                         "writeMode":"insert",
+                        "preSql": [
+                            "delete from XXX;"
+                        ],
                         "connection": [
                             {
                                 "jdbcUrl": "{target.db.url}",
@@ -45,6 +45,9 @@
                                     "{target.db.table.name}"
                                 ]
                             }
+                        ],
+                        "postSql": [
+                            "delete from XXX;"
                         ]
                     }
                 }
