@@ -1,15 +1,53 @@
 package com.xiaogj.dataxserver.vo;
 
 import java.io.Serializable;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DBInfoVO implements Serializable {
 
     private static final long serialVersionUID = -7912057106880308905L;
+    private int id;
     private String name;
     private String username;
     private String password;
     private String jdbcUrl;
-    private String querySql;
+    private Date baseServiceTime;
+    private List<SyncVO> syncList = new ArrayList<>();
+    private List<String> jsonPathList = new ArrayList<>();
+
+    public void addJsonPathList(String jsonPath) {
+        jsonPathList.add(jsonPath);
+    }
+
+    public List<String> getJsonPathList() {
+        return jsonPathList;
+    }
+
+    public void setJsonPathList(List<String> jsonPathList) {
+        this.jsonPathList = jsonPathList;
+    }
+
+    public void addSyncList(SyncVO syncVO) {
+        syncList.add(syncVO);
+    }
+
+    public List<SyncVO> getSyncList() {
+        return syncList;
+    }
+
+    public void setSyncList(List<SyncVO> syncList) {
+        this.syncList = syncList;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -43,11 +81,11 @@ public class DBInfoVO implements Serializable {
         this.jdbcUrl = jdbcUrl;
     }
 
-    public String getQuerySql() {
-        return querySql;
+    public Date getBaseServiceTime() {
+        return baseServiceTime;
     }
 
-    public void setQuerySql(String querySql) {
-        this.querySql = querySql;
+    public void setBaseServiceTime(Date baseServiceTime) {
+        this.baseServiceTime = baseServiceTime;
     }
 }

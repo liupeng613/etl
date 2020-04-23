@@ -16,16 +16,13 @@
                     "parameter": {
                         "username":"{source.db.username}",
                         "password":"{source.db.password}",
-                        "column": [
-                            "*"
-                        ],
                         "connection": [
                             {
-                                "table": [
-                                    "{source.db.table.name}"
-                                ],
                                 "jdbcUrl": [
                                     "{source.db.jdbcUrl}"
+                                ],
+                                "querySql": [
+                                    "{source.db.querySql}"
                                 ]
                             }
                         ]
@@ -46,10 +43,7 @@
                             }
                         ],
                         "column": [
-                            "*"
-                        ],
-                        "postSql": [
-                            "select count() from @table;"
+                            {target.db.table.columns}
                         ]
                     }
                 }

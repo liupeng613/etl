@@ -2,8 +2,8 @@ package com.xiaogj.dataxserver.service;
 
 
 import com.xiaogj.dataxserver.vo.DBInfoVO;
-import com.xiaogj.dataxserver.vo.DataTable;
-import com.xiaogj.dataxserver.vo.DataTableStatus;
+import com.xiaogj.dataxserver.vo.OperateTargetSqlVO;
+import com.xiaogj.dataxserver.vo.SyncVO;
 import com.xiaogj.dataxserver.vo.TableInfoVO;
 
 import java.sql.SQLException;
@@ -11,21 +11,20 @@ import java.util.List;
 
 public interface IDBInfoService {
 
-	List<DataTable> getTargetTransfterTables() throws SQLException;
+    List<DBInfoVO> getDBInfoList() throws SQLException;
 
-	List<String> getTargetTransfterTableColumns(String tableName) throws SQLException;
+    void createTabel4ClickHouse(List<String> createSqls) throws SQLException;
 
-	List<String> getTargetTransfterTablePrimaryKey(String tableName) throws SQLException;
+    void updateServiceTimeSync(List<TableInfoVO> syncList) throws SQLException;
 
-	List<DataTableStatus> getSourceTransfterTablesStatus() throws SQLException;
+    DBInfoVO getDBInfoById(int sourcedbId) throws SQLException;
 
-	long getSourceTransfterTableMigrationCount(String tableName, String whereClause) throws SQLException;
+    List<TableInfoVO> getTableInfoJoinSyncList(int sourcedbId) throws SQLException;
 
-	long getTargetTransfterTableMigrationFinishedCount(String tableName, String whereClause) throws SQLException;
+    void dropAllTable4ClickHouse(List<String> targetTableNameList) throws SQLException;
 
-	List<DBInfoVO> getDBInfoList();
+    List<OperateTargetSqlVO> getOperateTargetSqlList() throws SQLException;
 
-	List<TableInfoVO> getTableInfoList();
+    void execOperateSql(List<OperateTargetSqlVO> operateSqlList, String tablePrefix, String tableSuffix) throws Exception;
 
-	void createTabel() throws SQLException;
 }

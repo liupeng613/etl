@@ -3,9 +3,9 @@ package com.xiaogj.dataxserver.util;
 import com.jayway.jsonpath.JsonPath;
 import com.xiaogj.dataxserver.config.JobJsonConfig;
 import com.xiaogj.dataxserver.vo.DBInfoVO;
+import com.xiaogj.dataxserver.vo.SyncVO;
+import com.xiaogj.dataxserver.vo.TableInfoVO;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -16,8 +16,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Date;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 
 @Slf4j
@@ -29,49 +31,75 @@ public class DataXJobFile {
     @Autowired
     private JobJsonConfig jobJsonConfig;
 
-    public void generateMs2ChJsonJobFile(DBInfoVO sourceDB, DBInfoVO targetDB, String tableName, List<String> jsonPathList) {
-        long timeMillis = System.currentTimeMillis();
-        //String jsonPath = new StringBuffer("/usr/local/datax/job/").append(tableName).append("_").append(timeMillis).append(".json").toString();
+    public void generateMs2ChJsonJobFile(DBInfoVO sourceDB, DBInfoVO targetDB, TableInfoVO tableInfo, String targetTableName, String jobJsonDir, String format) {
         String jsonPath = null;
-        if (System.getProperty("os.name").toLowerCase().contains("windows")) {
-            jsonPath = new StringBuffer("D:\\Tools\\ETL\\dev\\DataX\\target\\datax-3.0.2\\datax-3.0.2\\job").append(tableName).append("_").append(timeMillis).append(".json").toString();
-        } else {
-            jsonPath = new StringBuffer("/usr/local/datax/datax-3.0.2/job/").append(tableName).append("_").append(timeMillis).append(".json").toString();
+        try {
+            if (!Files.exists(Paths.get(jobJsonDir.toString()))) {
+                Files.createDirectories(Paths.get(jobJsonDir.toString()));
+            }
+            jsonPath = new StringBuffer(jobJsonDir).append(sourceDB.getName()).append(".").append(tableInfo.getName()).append("_").append(format).append(".json").toString();
+        } catch (IOException e) {
+            log.error("create job directories fail:  ", e);
         }
-        jsonPathList.add(jsonPath);
+        sourceDB.addJsonPathList(jsonPath);
         String json = getTemplate();
+
         //CharSequence cols = getColumnsString(columns);
         //int channels = getChannelNumber(migrationRecords);
-        json = json.replace("{job.channel}", "1");
+        json = json.replace("{job.channel}", jobJsonConfig.getDataxJobChannel());
 
-
+        //source db
+        json = json.replace("{source.db.jdbcUrl}", sourceDB.getJdbcUrl());
         json = json.replace("{source.db.username}", sourceDB.getUsername());
         json = json.replace("{source.db.password}", sourceDB.getPassword());
-        //json = json.replace("{source.db.table.columns}", cols);
-        //json = json.replace("{source.db.table.pk}", pk == null ? "" : pk);
-        json = json.replace("{source.db.table.name}", "xgj_w1_mallplus.dbo."+tableName);
-        json = json.replace("{source.db.jdbcUrl}", sourceDB.getJdbcUrl());
-        //json = json.replace("{source.db.type}", getDbType(config.getSourceDbUrl()));
-        //json = json.replace("{source.db.type}", "sqlserver");
+        //json = json.replace("{source.db.table.name}", tableInfo.getName());
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String startTimeStr = null;
+        String endTimeStr = null;
 
+        SyncVO syncVO = tableInfo.getSyncVO();
+
+        Date serviceTimeSync = syncVO.getServiceTimeSync();
+        if (serviceTimeSync != null) {
+            startTimeStr = sdf.format(serviceTimeSync);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(serviceTimeSync);
+            //间隔暂时默认为1天，存在结束日期大于当前日期场景要去处理
+            calendar.add(Calendar.DATE, jobJsonConfig.getTimeInterval());
+            Calendar calendarNow = Calendar.getInstance();
+            calendarNow.set(Calendar.HOUR_OF_DAY, 0);
+            calendarNow.set(Calendar.MINUTE, 0);
+            calendarNow.set(Calendar.SECOND, 0);
+            calendarNow.set(Calendar.MILLISECOND, 0);
+            if (calendar.after(calendarNow))
+            {
+                log.warn("{} synchronization date plus interval days exceeds current date.", tableInfo.getName());
+                endTimeStr = sdf.format(calendarNow.getTime());
+                syncVO.setEndTime(new Date(calendarNow.getTime().getTime()));
+            }else {
+                endTimeStr = sdf.format(calendar.getTime());
+                syncVO.setEndTime(new Date(calendar.getTime().getTime()));
+            }
+        } else {
+            startTimeStr = "1970-01-01";
+            Date baseServiceTime = sourceDB.getBaseServiceTime();
+            endTimeStr = baseServiceTime.toString();
+            syncVO.setEndTime(baseServiceTime);
+        }
+        String querySql = tableInfo.getQuerySql().replace("{start.time}", startTimeStr);
+        querySql = querySql.replace("{end.time}", endTimeStr);
+        json = json.replace("{source.db.querySql}", querySql);
+
+        //target db
+        json = json.replace("{target.db.jdbcUrl}", targetDB.getJdbcUrl());
         json = json.replace("{target.db.username}", targetDB.getUsername());
         json = json.replace("{target.db.password}", targetDB.getPassword());
-        //json = json.replace("{target.db.table.columns}", cols);
-        json = json.replace("{target.db.table.name}", "perfor."+tableName);
-        json = json.replace("{target.db.jdbcUrl}", targetDB.getJdbcUrl());
-        //json = json.replace("{target.db.type}", getDbType(config.getTargetDbUrl()));
+        json = json.replace("{target.db.table.name}", targetTableName);
+        json = json.replace("{target.db.table.columns}", tableInfo.getWriteColumn());
 
-        //log.info(json);
-
-        log.info("Write ms2chJob for table: {}", tableName);
+        log.info("Write ms2chJob for table: {}", tableInfo.getName());
         write2File(jsonPath, json);
-    }
-
-    public static void main(String[] args) {
-        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String format = dateTimeFormat.format(0);
-        System.out.println(format);
     }
 
     public void generateJsonJobFile(String sourceTableName, String targetTableName, List<String> columns, String pk, String whereClause, long migrationRecords) {
@@ -79,9 +107,9 @@ public class DataXJobFile {
         String json = getTemplate();
 
         CharSequence cols = getColumnsString(columns);
-        int channels = getChannelNumber(migrationRecords);
+        //int channels = getChannelNumber(migrationRecords);
 
-        json = json.replace("{job.channel}", String.valueOf(channels));
+        //json = json.replace("{job.channel}", String.valueOf(channels));
         json = json.replace("{source.db.username}", jobJsonConfig.getSourceDbUsername());
         json = json.replace("{source.db.password}", jobJsonConfig.getSourceDbPassword());
         json = json.replace("{source.db.table.columns}", cols);
@@ -127,43 +155,6 @@ public class DataXJobFile {
         return dbType;
     }
 
-    private int getChannelNumber(long migrationRecords) {
-        int result = 1;
-        if ("true".equalsIgnoreCase(jobJsonConfig.getDataxUseMultipleChannel()) && migrationRecords > 0) {
-            if (migrationRecords > jobJsonConfig.getDataxUse2ChannelRecordsOver()) {
-                result = 2;
-            }
-            if (migrationRecords > jobJsonConfig.getDataxUse4ChannelRecordsOver()) {
-                result = 4;
-            }
-            if (migrationRecords > jobJsonConfig.getDataxUseNChannelRecordsOver()) {
-                result = jobJsonConfig.getDataxUseNChannelNumber();
-            }
-
-        }
-        return result;
-    }
-
-    public String getSourceGlobalTableWhereClause(List<String> columns) {
-        String whereCase1 = jobJsonConfig.getGlobalWhereClause();
-        String whereCase2 = jobJsonConfig.getGlobalWhere2Clause();
-        String result = null;
-        if (columns != null && !columns.isEmpty()) {
-            if (hasWhereColumn(whereCase1, columns)) {
-                result = whereCase1;
-            } else if (hasWhereColumn(whereCase2, columns)) {
-                result = whereCase2;
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Pre-condition: the job file has need to be generated.
-     *
-     * @param tableName String
-     * @return String
-     */
     public String getJobFileWhereClause(String tableName) {
         String jsonContent = this.ReadFile(jobJsonConfig.getDataxToolFolder() + "/job/" + tableName + ".json");
         String value = null;
@@ -209,7 +200,7 @@ public class DataXJobFile {
             writer.write(json);
             writer.flush();
             writer.close();
-            log.info("Write json to file: {}",  filePath);
+            log.info("Write json to file: {}", filePath);
         } catch (IOException e1) {
             e1.printStackTrace();
         }
@@ -224,15 +215,14 @@ public class DataXJobFile {
         log.info("Write json to file:" + file.getAbsolutePath());
     }
 
-    private CharSequence getColumnsString(List<String> columns) {
+    private String getColumnsString(List<String> columns) {
         StringBuffer stb = new StringBuffer();
-
         for (String s : columns) {
             stb.append("\"");
             stb.append(s);
             stb.append("\",");
         }
-        return stb.subSequence(0, stb.length() - 1);
+        return stb.subSequence(0, stb.length() - 1).toString();
     }
 
     private String getTemplate() {
