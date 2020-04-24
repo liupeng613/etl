@@ -50,9 +50,9 @@ public class JdbcHelper {
             ds.setDriverClassName("com.github.housepower.jdbc.ClickHouseDriver");
         }else{
             ds.setQueryTimeout(120);
+            ds.setTestOnBorrow(true);
+            //ds.setValidationQuery("SELECT 1");
         }
-        //targetds.setValidationQuery("SELECT 1");
-        ds.setTestOnBorrow(false);
         ds.setTestWhileIdle(false);
         ds.setPoolPreparedStatements(false);
 
